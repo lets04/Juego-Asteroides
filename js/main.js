@@ -1,4 +1,7 @@
 import { Player } from "./nave.js";
+import { Bullet } from "./bullet.js";
+
+const bullets = [];
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -31,6 +34,12 @@ window.addEventListener("keyup", (e) => {
   }
 });
 
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    shoot();
+  }
+});
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -47,10 +56,24 @@ function update() {
   timeElement.innerText = timeElapsed;
 
   scoreElement.innerText = score;
+
+  bullets.forEach((b) => b.update());
 }
 
 function draw() {
   player.draw(ctx);
+  bullets.forEach((b) => b.draw(ctx));
 }
 
 gameLoop();
+
+function shoot() {
+  const offset = 20;
+
+  const angle = player.angle - Math.PI / 2;
+
+  const bulletX = player.x + Math.cos(angle) * offset;
+  const bulletY = player.y + Math.sin(angle) * offset;
+
+  bullets.push(new Bullet(bulletX, bulletY, angle));
+}
