@@ -1,26 +1,35 @@
 export class Player {
-    
   constructor(x, y) {
     this.x = x;
     this.y = y;
     this.angle = 0;
+    this.rotationSpeed = 0.05;
   }
 
-  update() {
-    
+  update(keys) {
+    if (keys.ArrowLeft) {
+      this.angle -= this.rotationSpeed;
+    }
+    if (keys.ArrowRight) {
+      this.angle += this.rotationSpeed;
+    }
   }
 
   draw(ctx) {
+    ctx.save();
+
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+
     ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x - 10, this.y + 20);
-    ctx.lineTo(this.x + 10, this.y + 20);
-    //ctx.moveTo(80, 70);
-    //ctx.lineTo(90, 80);
-    //ctx.lineTo(70, 80);
-    //ctx.lineTo(80, 70);
-    ctx.strokeStyle = "white";
+    ctx.moveTo(0, -20);
+    ctx.lineTo(-12, 10);
+    ctx.lineTo(12, 10);
     ctx.closePath();
+
+    ctx.strokeStyle = "white";
     ctx.stroke();
+
+    ctx.restore();
   }
 }
