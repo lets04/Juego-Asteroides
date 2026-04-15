@@ -2,11 +2,12 @@ export class Bullet {
   constructor(x, y, angle) {
     this.x = x;
     this.y = y;
-    this.angle = angle;
+    this.angle = angle; 
     this.speed = 6;
   }
 
   update() {
+    //movimiento en la dirección del ángulo
     this.x += Math.cos(this.angle) * this.speed;
     this.y += Math.sin(this.angle) * this.speed;
   }

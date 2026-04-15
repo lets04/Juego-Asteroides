@@ -22,7 +22,7 @@ export class Player {
     ctx.rotate(this.angle);
 
     ctx.beginPath();
-    ctx.moveTo(0, -20);
+    ctx.moveTo(0, -20); //punta de la nave
     ctx.lineTo(-12, 10);
     ctx.lineTo(12, 10);
     ctx.closePath();

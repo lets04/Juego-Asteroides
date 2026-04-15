@@ -47,7 +47,7 @@ window.addEventListener("keyup", (e) => {
 
 window.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
-    shoot();
+    shoot(); //dispara
   }
 });
 // Crear 5 rocas al empezar
@@ -77,7 +77,7 @@ function update() {
   bullets.forEach((b, bIndex) => {
     b.update();
     
-    // Opcional: Eliminar balas que salen de la pantalla para optimizar
+    // Eliminar balas que salen de la pantalla para optimizar
     if(b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
         bullets.splice(bIndex, 1);
     }
@@ -112,18 +112,17 @@ function update() {
 function draw() {
   player.draw(ctx);
   bullets.forEach((b) => b.draw(ctx));
-  rocks.forEach((r) => r.draw(ctx)); // <--- Dibujar rocas
+  rocks.forEach((r) => r.draw(ctx)); // Dibujar rocas
 }
-
-gameLoop();
-
 function shoot() {
   const offset = 20;
 
   const angle = player.angle - Math.PI / 2;
-
+ //posición de la punta de la nave
   const bulletX = player.x + Math.cos(angle) * offset;
   const bulletY = player.y + Math.sin(angle) * offset;
-
+ // bala con posición y dirección
   bullets.push(new Bullet(bulletX, bulletY, angle));
 }
+
+
