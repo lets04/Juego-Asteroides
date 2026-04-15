@@ -11,6 +11,15 @@ const ctx = canvas.getContext("2d");
 const scoreElement = document.getElementById("scoreValue");
 const timeElement = document.getElementById("timeValue");
 
+// Capturamos el color que definiste en el CSS
+// En tu archivo principal, antes de crear las rocas:
+const style = getComputedStyle(document.body);
+const themeColor = style.getPropertyValue('--main-color').trim() || "white";
+
+// Cuando las crees:
+for (let i = 0; i < 5; i++) {
+    rocks.push(new Rock(canvas.width, canvas.height, themeColor));
+}
 const keys = {
   ArrowLeft: false,
   ArrowRight: false,

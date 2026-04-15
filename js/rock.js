@@ -1,33 +1,69 @@
-
 export class Rock {
-    constructor(canvasWidth, canvasHeight) {
-      // Posición aleatoria
-      this.x = Math.random() * canvasWidth;
-      this.y = Math.random() * canvasHeight;
-      
-      // Velocidad y dirección aleatoria
-      this.vx = (Math.random() - 0.5) * 4; 
-      this.vy = (Math.random() - 0.5) * 4;
-      
-      this.radius = 20 + Math.random() * 20; // Tamaño variado
+    // Añade 'color' como tercer parámetro
+    constructor(canvasWidth, canvasHeight, color = "white") {
+        this.x = Math.random() * canvasWidth;
+        this.y = Math.random() * canvasHeight;
+        this.vx = (Math.random() - 0.5) * 3;
+        this.vy = (Math.random() - 0.5) * 3;
+        this.angle = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+
+        this.radius = 25 + Math.random() * 15;
+        this.totalPoints = 8 + Math.floor(Math.random() * 4);
+        this.offsets = [];
+        this.color = color; // <--- AGREGAR ESTO
+
+        for (let i = 0; i < this.totalPoints; i++) {
+            this.offsets.push(Math.random() * 12 - 6);
+        }
     }
-  
-    update(canvasWidth, canvasHeight) {
-      this.x += this.vx;
-      this.y += this.vy;
-  
-      // Efecto "Toroide" (si sale por un lado, entra por el otro)
-      if (this.x < 0) this.x = canvasWidth;
-      if (this.x > canvasWidth) this.x = 0;
-      if (this.y < 0) this.y = canvasHeight;
-      if (this.y > canvasHeight) this.y = 0;
+
+    update(w, h) {
+        // Actualizar posición (Movimiento)
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Actualizar ángulo (Rotación constante)
+        this.angle += this.rotationSpeed;
+
+        // Efecto "Toroide" (Wraparound): si sale, entra por el otro lado
+        if (this.x < 0) this.x = w;
+        if (this.x > w) this.x = 0;
+        if (this.y < 0) this.y = h;
+        if (this.y > h) this.y = 0;
     }
-  
+
     draw(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = "white";
-      ctx.stroke();
-      ctx.closePath();
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        ctx.beginPath();
+        for (let i = 0; i < this.totalPoints; i++) {
+            const baseAngle = (i / this.totalPoints) * Math.PI * 2;
+            const r = this.radius + this.offsets[i];
+            const x = Math.cos(baseAngle) * r;
+            const y = Math.sin(baseAngle) * r;
+
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+
+        // --- CONFIGURACIÓN DE ESTILO ---
+        ctx.strokeStyle = this.color; // Usa el color del tema
+        ctx.lineWidth = 2;
+
+        // Efecto de brillo (Glow) que combine con tu CSS
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+
+        ctx.stroke();
+
+        // Un relleno muy sutil para que no se vean vacías
+        ctx.fillStyle = this.color + "1A"; // 10% de opacidad
+        ctx.fill();
+
+        ctx.restore();
     }
-  }
+}
