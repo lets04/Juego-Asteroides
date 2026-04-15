@@ -1,7 +1,9 @@
 import { Player } from "./nave.js";
 import { Bullet } from "./bullet.js";
+import { Rock } from "./rock.js";
 
 const bullets = [];
+const rocks = [];
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -39,6 +41,12 @@ window.addEventListener("keydown", (e) => {
     shoot();
   }
 });
+// Crear 5 rocas al empezar
+for (let i = 0; i < 5; i++) {
+  rocks.push(new Rock(canvas.width, canvas.height));
+}
+
+gameLoop();
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
