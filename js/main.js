@@ -62,15 +62,48 @@ function update() {
 
   const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
   timeElement.innerText = timeElapsed;
-
   scoreElement.innerText = score;
 
-  bullets.forEach((b) => b.update());
+  // Actualizar Balas
+  bullets.forEach((b, bIndex) => {
+    b.update();
+    
+    // Opcional: Eliminar balas que salen de la pantalla para optimizar
+    if(b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+        bullets.splice(bIndex, 1);
+    }
+  });
+
+  // Actualizar Rocas y detectar colisiones
+  rocks.forEach((rock, rIndex) => {
+    rock.update(canvas.width, canvas.height);
+
+    // Colisión Bala vs Roca
+    bullets.forEach((bullet, bIndex) => {
+      const dist = Math.hypot(bullet.x - rock.x, bullet.y - rock.y);
+      
+      // Si la distancia es menor al radio de la roca (aprox 20)
+      if (dist < rock.radius) {
+        // Eliminar ambos objetos
+        rocks.splice(rIndex, 1);
+        bullets.splice(bIndex, 1);
+        
+        // Aumentar puntaje
+        score += 100;
+
+        // Crear una nueva roca después de un tiempo para que no se acaben
+        setTimeout(() => {
+            rocks.push(new Rock(canvas.width, canvas.height));
+        }, 1000);
+      }
+    });
+  });
 }
 
 function draw() {
   player.draw(ctx);
   bullets.forEach((b) => b.draw(ctx));
+  rocks.forEach((r) => r.draw(ctx)); // <--- Dibujar rocas
 }
 
 gameLoop();
