@@ -4,6 +4,7 @@ export class Player {
     this.y = y;
     this.angle = 0;
     this.rotationSpeed = 0.05;
+    this.radius = 15;
   }
 
   update(keys) {

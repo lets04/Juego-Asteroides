@@ -4,6 +4,7 @@ import { Rock } from "./rock.js";
 
 const bullets = [];
 const rocks = [];
+let isGameOver = false;
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -58,6 +59,8 @@ for (let i = 0; i < 5; i++) {
 gameLoop();
 
 function gameLoop() {
+  if (isGameOver) return; 
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   update();
@@ -107,6 +110,26 @@ function update() {
       }
     });
   });
+  //Colisión Nave vs Roca
+  rocks.forEach((rock) => {
+    const dist = Math.hypot(player.x - rock.x, player.y - rock.y);
+  
+    if (dist < player.radius + rock.radius) {
+      gameOver();
+    }
+  });
+}
+
+
+function gameOver() {
+  if (isGameOver) return; 
+
+  isGameOver = true;
+
+  setTimeout(() => {
+    alert(" Game Over");
+    location.reload();
+  }, 100);
 }
 
 function draw() {
