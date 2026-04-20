@@ -15,19 +15,21 @@ const timeElement = document.getElementById("timeValue");
 // Capturamos el color que definiste en el CSS
 // En tu archivo principal, antes de crear las rocas:
 const style = getComputedStyle(document.body);
-const themeColor = style.getPropertyValue('--main-color').trim() || "white";
+const themeColor = style.getPropertyValue("--main-color").trim() || "white";
 
 // Cuando las crees:
 for (let i = 0; i < 5; i++) {
-    rocks.push(new Rock(canvas.width, canvas.height, themeColor));
+  rocks.push(new Rock(canvas.width, canvas.height, themeColor));
 }
 const keys = {
   ArrowLeft: false,
   ArrowRight: false,
 };
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const container = document.getElementById("game-container");
+
+canvas.width = container.clientWidth;
+canvas.height = container.clientHeight;
 
 const player = new Player(canvas.width / 2, canvas.height / 2);
 
@@ -59,7 +61,7 @@ for (let i = 0; i < 5; i++) {
 gameLoop();
 
 function gameLoop() {
-  if (isGameOver) return; 
+  if (isGameOver) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -75,14 +77,13 @@ function update() {
   const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
   timeElement.innerText = timeElapsed;
   scoreElement.innerText = score;
-
   // Actualizar Balas
   bullets.forEach((b, bIndex) => {
     b.update();
-    
+
     // Eliminar balas que salen de la pantalla para optimizar
-    if(b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
-        bullets.splice(bIndex, 1);
+    if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+      bullets.splice(bIndex, 1);
     }
   });
 
@@ -93,19 +94,19 @@ function update() {
     // Colisión Bala vs Roca
     bullets.forEach((bullet, bIndex) => {
       const dist = Math.hypot(bullet.x - rock.x, bullet.y - rock.y);
-      
+
       // Si la distancia es menor al radio de la roca (aprox 20)
       if (dist < rock.radius) {
         // Eliminar ambos objetos
         rocks.splice(rIndex, 1);
         bullets.splice(bIndex, 1);
-        
+
         // Aumentar puntaje
         score += 100;
 
         // Crear una nueva roca después de un tiempo para que no se acaben
         setTimeout(() => {
-            rocks.push(new Rock(canvas.width, canvas.height));
+          rocks.push(new Rock(canvas.width, canvas.height));
         }, 1000);
       }
     });
@@ -113,23 +114,19 @@ function update() {
   //Colisión Nave vs Roca
   rocks.forEach((rock) => {
     const dist = Math.hypot(player.x - rock.x, player.y - rock.y);
-  
+
     if (dist < player.radius + rock.radius) {
       gameOver();
     }
   });
 }
 
-
 function gameOver() {
-  if (isGameOver) return; 
-
-  isGameOver = true;
-
-  setTimeout(() => {
-    alert(" Game Over");
-    location.reload();
-  }, 100);
+    isGameOver = true;
+    setTimeout(() => {
+      alert("Game Over");
+      location.reload();
+    }, 100);
 }
 
 function draw() {
@@ -141,11 +138,9 @@ function shoot() {
   const offset = 20;
 
   const angle = player.angle - Math.PI / 2;
- //posición de la punta de la nave
+  //posición de la punta de la nave
   const bulletX = player.x + Math.cos(angle) * offset;
   const bulletY = player.y + Math.sin(angle) * offset;
- // bala con posición y dirección
+  // bala con posición y dirección
   bullets.push(new Bullet(bulletX, bulletY, angle));
 }
-
-

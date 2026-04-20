@@ -3,7 +3,7 @@ export class Player {
     this.x = x;
     this.y = y;
     this.angle = 0;
-    this.rotationSpeed = 0.05;
+    this.rotationSpeed = 0.07;
     this.radius = 15;
   }
 
