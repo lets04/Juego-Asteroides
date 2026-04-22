@@ -6,6 +6,12 @@ const bullets = [];
 const rocks = [];
 let isGameOver = false;
 
+let lastShot = 0;
+const shootDelay = 200;
+
+let lives = 3;
+const livesElement = document.getElementById("livesValue");
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -24,6 +30,7 @@ for (let i = 0; i < 5; i++) {
 const keys = {
   ArrowLeft: false,
   ArrowRight: false,
+  Space: false,
 };
 
 const container = document.getElementById("game-container");
@@ -40,17 +47,19 @@ window.addEventListener("keydown", (e) => {
   if (keys.hasOwnProperty(e.key)) {
     keys[e.key] = true;
   }
+
+  if (e.code === "Space") {
+    keys.Space = true;
+  }
 });
 
 window.addEventListener("keyup", (e) => {
   if (keys.hasOwnProperty(e.key)) {
     keys[e.key] = false;
   }
-});
 
-window.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
-    shoot(); //dispara
+    keys.Space = false;
   }
 });
 // Crear 5 rocas al empezar
@@ -107,37 +116,65 @@ function update() {
       }
     });
   });
+
   //Colisión Nave vs Roca
-  rocks.forEach((rock) => {
+  livesElement.innerText = lives;
+  rocks.forEach((rock, index) => {
     const dist = Math.hypot(player.x - rock.x, player.y - rock.y);
 
     if (dist < player.radius + rock.radius) {
-      gameOver();
+      // eliminar roca
+      rocks.splice(index, 1);
+
+      // reducir vidas
+      lives--;
+
+      // actualizar UI
+      livesElement.innerText = lives;
+
+      if (lives <= 0) {
+        gameOver();
+      } else {
+        // reposicionar jugador
+        player.x = canvas.width / 2;
+        player.y = canvas.height / 2;
+      }
     }
   });
+  if (keys.Space) {
+    shoot();
+  }
 }
 
 function gameOver() {
   isGameOver = true;
-  setTimeout(() => {
-    alert("Game Over");
-    location.reload();
-  }, 100);
 }
 
 function draw() {
   player.draw(ctx);
   bullets.forEach((b) => b.draw(ctx));
-  rocks.forEach((r) => r.draw(ctx)); // Dibujar rocas
-}
-function shoot() {
-  const offset = 20;
+  rocks.forEach((r) => r.draw(ctx));
 
+  if (isGameOver) {
+    ctx.fillStyle = "white";
+    ctx.font = "40px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+  }
+}
+
+function shoot() {
+  const now = Date.now();
+  if (now - lastShot < shootDelay) return;
+
+  lastShot = now;
+
+  const offset = 20;
   const angle = player.angle - Math.PI / 2;
-  //posición de la punta de la nave
+
   const bulletX = player.x + Math.cos(angle) * offset;
   const bulletY = player.y + Math.sin(angle) * offset;
-  // bala con posición y dirección
+
   bullets.push(new Bullet(bulletX, bulletY, angle));
 }
 
@@ -149,7 +186,7 @@ function fragmentRock(rock) {
           canvas.width,
           canvas.height,
           rock.color,
-          rock.size - 1, // 👈 más pequeña
+          rock.size - 1,
           rock.x,
           rock.y
         )
