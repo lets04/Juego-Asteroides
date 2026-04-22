@@ -10,6 +10,8 @@ let isGameOver = false;
 let lastShot = 0;
 const shootDelay = 200;
 
+let playerName = "Jugador";
+
 let lives = 3;
 const livesElement = document.getElementById("livesValue");
 let lastSpawn = 0;
@@ -30,10 +32,15 @@ const themeColor = style.getPropertyValue("--main-color").trim() || "white";
 const startScreen = document.getElementById("start-screen");
 const startBtn = document.getElementById("startBtn");
 const playerNameInput = document.getElementById("playerNameInput");
-
-let playerName = "Jugador";
-
 const playerNameUI = document.getElementById("playerNameUI");
+
+const gameOverScreen = document.getElementById("game-over-screen");
+const restartBtn = document.getElementById("restartBtn");
+const finalScore = document.getElementById("finalScore");
+
+restartBtn.addEventListener("click", () => {
+  resetGame();
+});
 
 // Cuando las crees:
 for (let i = 0; i < 5; i++) {
@@ -42,6 +49,7 @@ for (let i = 0; i < 5; i++) {
 const keys = {
   ArrowLeft: false,
   ArrowRight: false,
+  ArrowUp: false,
   Space: false,
 };
 
@@ -109,7 +117,7 @@ function gameLoop() {
 
 function update() {
   //  jugador
-  player.update(keys);
+  player.update(keys, canvas);
 
   //  tiempo y score
   const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -206,6 +214,34 @@ function update() {
 
 function gameOver() {
   isGameOver = true;
+
+  finalScore.innerText = `${playerName}, tu puntaje fue: ${score}`;
+
+  gameOverScreen.style.display = "flex";
+}
+
+function resetGame() {
+  lives = 3;
+  score = 0;
+  rocks.length = 0;
+  bullets.length = 0;
+  explosions.length = 0;
+
+  isGameOver = false;
+  gameStarted = true;
+
+  player.x = canvas.width / 2;
+  player.y = canvas.height / 2;
+
+  startTime = Date.now();
+  gameOverScreen.style.display = "none";
+
+  // recrear rocas
+  for (let i = 0; i < 5; i++) {
+    rocks.push(new Rock(canvas.width, canvas.height, themeColor, 3));
+  }
+
+  gameLoop();
 }
 
 function draw() {
@@ -215,10 +251,7 @@ function draw() {
   explosions.forEach((e) => e.draw(ctx));
 
   if (isGameOver) {
-    ctx.fillStyle = "white";
-    ctx.font = "40px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+    return;
   }
 }
 
