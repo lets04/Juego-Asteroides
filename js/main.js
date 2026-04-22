@@ -1,6 +1,7 @@
 import { Player } from "./nave.js";
 import { Bullet } from "./bullet.js";
 import { Rock } from "./rock.js";
+import { Explosion } from "./explosion.js";
 
 const bullets = [];
 const rocks = [];
@@ -11,6 +12,9 @@ const shootDelay = 200;
 
 let lives = 3;
 const livesElement = document.getElementById("livesValue");
+let lastSpawn = 0;
+const spawnDelay = 1500; // cada 1.5 segundos
+const explosions = [];
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -78,71 +82,93 @@ function gameLoop() {
 }
 
 function update() {
+  // 🎮 jugador
   player.update(keys);
 
+  // ⏱️ tiempo y score
   const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
   timeElement.innerText = timeElapsed;
   scoreElement.innerText = score;
-  // Actualizar Balas
-  bullets.forEach((b, bIndex) => {
+  livesElement.innerText = lives;
+
+  // 🔫 BALAS
+  for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
+    const b = bullets[bIndex];
     b.update();
 
-    // Eliminar balas que salen de la pantalla para optimizar
     if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
       bullets.splice(bIndex, 1);
     }
-  });
+  }
 
-  // Actualizar Rocas y detectar colisiones
-  rocks.forEach((rock, rIndex) => {
+  // 🪨 ROCAS + 💥 COLISIÓN
+  for (let rIndex = rocks.length - 1; rIndex >= 0; rIndex--) {
+    const rock = rocks[rIndex];
     rock.update(canvas.width, canvas.height);
 
-    // Colisión Bala vs Roca
-    bullets.forEach((bullet, bIndex) => {
+    for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
+      const bullet = bullets[bIndex];
+
       const dist = Math.hypot(bullet.x - rock.x, bullet.y - rock.y);
 
-      // Si la distancia es menor al radio de la roca (aprox 20)
       if (dist < rock.radius) {
-        const destroyedRock = rock;
+        explosions.push(new Explosion(rock.x, rock.y, bullet.color));
 
         rocks.splice(rIndex, 1);
         bullets.splice(bIndex, 1);
 
-        // 💥 fragmentar
-        fragmentRock(destroyedRock);
+        fragmentRock(rock);
+        score += rock.size * 100;
 
-        // 🎯 puntaje según tamaño
-        score += destroyedRock.size * 100;
+        break;
       }
-    });
-  });
+    }
+  }
 
-  //Colisión Nave vs Roca
-  livesElement.innerText = lives;
-  rocks.forEach((rock, index) => {
+  // 🚀 COLISIÓN NAVE
+  for (let i = rocks.length - 1; i >= 0; i--) {
+    const rock = rocks[i];
+
     const dist = Math.hypot(player.x - rock.x, player.y - rock.y);
 
     if (dist < player.radius + rock.radius) {
-      // eliminar roca
-      rocks.splice(index, 1);
+      rocks.splice(i, 1);
 
-      // reducir vidas
       lives--;
-
-      // actualizar UI
-      livesElement.innerText = lives;
 
       if (lives <= 0) {
         gameOver();
       } else {
-        // reposicionar jugador
         player.x = canvas.width / 2;
         player.y = canvas.height / 2;
       }
+
+      break;
     }
-  });
+  }
+
+  // 🔫 disparo
   if (keys.Space) {
     shoot();
+  }
+
+  // 💥 explosiones
+  for (let i = explosions.length - 1; i >= 0; i--) {
+    const e = explosions[i];
+    e.update();
+
+    if (e.isDone()) {
+      explosions.splice(i, 1);
+    }
+  }
+  const now = Date.now();
+
+  if (now - lastSpawn > spawnDelay) {
+    lastSpawn = now;
+
+    const size = Math.random() > 0.5 ? 3 : 2;
+
+    rocks.push(new Rock(canvas.width, canvas.height, themeColor, size));
   }
 }
 
@@ -154,6 +180,7 @@ function draw() {
   player.draw(ctx);
   bullets.forEach((b) => b.draw(ctx));
   rocks.forEach((r) => r.draw(ctx));
+  explosions.forEach((e) => e.draw(ctx));
 
   if (isGameOver) {
     ctx.fillStyle = "white";
