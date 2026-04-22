@@ -163,6 +163,19 @@ function draw() {
   }
 }
 
+function getRandomColor() {
+  const colors = [
+    "#00ffcc", // verde neon
+    "#ff4d4d", // rojo
+    "#ffd700", // amarillo
+    "#00aaff", // azul
+    "#ff00ff", // rosa
+    "#ffffff", // blanco
+  ];
+
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
 function shoot() {
   const now = Date.now();
   if (now - lastShot < shootDelay) return;
@@ -175,7 +188,7 @@ function shoot() {
   const bulletX = player.x + Math.cos(angle) * offset;
   const bulletY = player.y + Math.sin(angle) * offset;
 
-  bullets.push(new Bullet(bulletX, bulletY, angle));
+  bullets.push(new Bullet(bulletX, bulletY, angle, getRandomColor()));
 }
 
 function fragmentRock(rock) {
