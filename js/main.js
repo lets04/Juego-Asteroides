@@ -19,7 +19,7 @@ const themeColor = style.getPropertyValue("--main-color").trim() || "white";
 
 // Cuando las crees:
 for (let i = 0; i < 5; i++) {
-  rocks.push(new Rock(canvas.width, canvas.height, themeColor));
+  rocks.push(new Rock(canvas.width, canvas.height, themeColor, 3));
 }
 const keys = {
   ArrowLeft: false,
@@ -54,9 +54,6 @@ window.addEventListener("keydown", (e) => {
   }
 });
 // Crear 5 rocas al empezar
-for (let i = 0; i < 5; i++) {
-  rocks.push(new Rock(canvas.width, canvas.height));
-}
 
 gameLoop();
 
@@ -97,17 +94,16 @@ function update() {
 
       // Si la distancia es menor al radio de la roca (aprox 20)
       if (dist < rock.radius) {
-        // Eliminar ambos objetos
+        const destroyedRock = rock;
+
         rocks.splice(rIndex, 1);
         bullets.splice(bIndex, 1);
 
-        // Aumentar puntaje
-        score += 100;
+        // 💥 fragmentar
+        fragmentRock(destroyedRock);
 
-        // Crear una nueva roca después de un tiempo para que no se acaben
-        setTimeout(() => {
-          rocks.push(new Rock(canvas.width, canvas.height));
-        }, 1000);
+        // 🎯 puntaje según tamaño
+        score += destroyedRock.size * 100;
       }
     });
   });
@@ -122,11 +118,11 @@ function update() {
 }
 
 function gameOver() {
-    isGameOver = true;
-    setTimeout(() => {
-      alert("Game Over");
-      location.reload();
-    }, 100);
+  isGameOver = true;
+  setTimeout(() => {
+    alert("Game Over");
+    location.reload();
+  }, 100);
 }
 
 function draw() {
@@ -143,4 +139,21 @@ function shoot() {
   const bulletY = player.y + Math.sin(angle) * offset;
   // bala con posición y dirección
   bullets.push(new Bullet(bulletX, bulletY, angle));
+}
+
+function fragmentRock(rock) {
+  if (rock.size > 1) {
+    for (let i = 0; i < 2; i++) {
+      rocks.push(
+        new Rock(
+          canvas.width,
+          canvas.height,
+          rock.color,
+          rock.size - 1, // 👈 más pequeña
+          rock.x,
+          rock.y
+        )
+      );
+    }
+  }
 }

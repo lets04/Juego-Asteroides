@@ -1,17 +1,22 @@
 export class Rock {
     // Añade 'color' como tercer parámetro
-    constructor(canvasWidth, canvasHeight, color = "white") {
-        this.x = Math.random() * canvasWidth;
-        this.y = Math.random() * canvasHeight;
-        this.vx = (Math.random() - 0.5) * 3;
-        this.vy = (Math.random() - 0.5) * 3;
+    constructor(canvasWidth, canvasHeight, color = "white", size = 3, x = null, y = null) {
+        this.size = size;
+
+        this.radius = (25 + Math.random() * 15) * (size / 3); // tamaño dinámico
+
+        this.x = x ?? Math.random() * canvasWidth; //permitir spawn en punto exacto
+        this.y = y ?? Math.random() * canvasHeight;
+
+        this.vx = (Math.random() - 0.5) * (4 - size); //más pequeñas = más rápidas
+        this.vy = (Math.random() - 0.5) * (4 - size);
+
         this.angle = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() - 0.5) * 0.1;
 
-        this.radius = 25 + Math.random() * 15;
         this.totalPoints = 8 + Math.floor(Math.random() * 4);
         this.offsets = [];
-        this.color = color; // <--- AGREGAR ESTO
+        this.color = color;
 
         for (let i = 0; i < this.totalPoints; i++) {
             this.offsets.push(Math.random() * 12 - 6);
