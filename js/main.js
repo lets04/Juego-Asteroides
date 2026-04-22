@@ -27,6 +27,14 @@ const timeElement = document.getElementById("timeValue");
 const style = getComputedStyle(document.body);
 const themeColor = style.getPropertyValue("--main-color").trim() || "white";
 
+const startScreen = document.getElementById("start-screen");
+const startBtn = document.getElementById("startBtn");
+const playerNameInput = document.getElementById("playerNameInput");
+
+let playerName = "Jugador";
+
+const playerNameUI = document.getElementById("playerNameUI");
+
 // Cuando las crees:
 for (let i = 0; i < 5; i++) {
   rocks.push(new Rock(canvas.width, canvas.height, themeColor, 3));
@@ -68,10 +76,28 @@ window.addEventListener("keyup", (e) => {
 });
 // Crear 5 rocas al empezar
 
-gameLoop();
+let gameStarted = false;
+startBtn.addEventListener("click", () => {
+  const name = playerNameInput.value.trim();
+
+  if (name !== "") {
+    playerName = name;
+  }
+
+  startScreen.style.display = "none";
+
+  startGame();
+});
+
+function startGame() {
+  playerNameUI.innerText = playerName;
+  gameStarted = true;
+  startTime = Date.now();
+  gameLoop();
+}
 
 function gameLoop() {
-  if (isGameOver) return;
+  if (!gameStarted || isGameOver) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -82,16 +108,16 @@ function gameLoop() {
 }
 
 function update() {
-  // 🎮 jugador
+  //  jugador
   player.update(keys);
 
-  // ⏱️ tiempo y score
+  //  tiempo y score
   const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
   timeElement.innerText = timeElapsed;
   scoreElement.innerText = score;
   livesElement.innerText = lives;
 
-  // 🔫 BALAS
+  //  BALAS
   for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
     const b = bullets[bIndex];
     b.update();
@@ -101,7 +127,7 @@ function update() {
     }
   }
 
-  // 🪨 ROCAS + 💥 COLISIÓN
+  //  ROCAS + COLISIÓN
   for (let rIndex = rocks.length - 1; rIndex >= 0; rIndex--) {
     const rock = rocks[rIndex];
     rock.update(canvas.width, canvas.height);
@@ -133,22 +159,22 @@ function update() {
 
     if (dist < player.radius + rock.radius) {
       rocks.splice(i, 1);
-    
+
       lives--;
-    
+
       container.classList.add("damage");
-    
+
       setTimeout(() => {
         container.classList.remove("damage");
-      }, 500); 
-    
+      }, 500);
+
       if (lives <= 0) {
         gameOver();
       } else {
         player.x = canvas.width / 2;
         player.y = canvas.height / 2;
       }
-    
+
       break;
     }
   }
@@ -234,8 +260,8 @@ function fragmentRock(rock) {
           rock.color,
           rock.size - 1,
           rock.x,
-          rock.y
-        )
+          rock.y,
+        ),
       );
     }
   }
