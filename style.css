@@ -41,3 +41,8 @@ canvas {
 
   text-shadow: 0 0 10px var(--main-color);
 }
+
+#game-container.damage {
+  border: 3px solid red;
+  box-shadow: 0 0 25px red;
+}

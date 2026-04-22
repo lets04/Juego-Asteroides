@@ -125,7 +125,7 @@ function update() {
     }
   }
 
-  // 🚀 COLISIÓN NAVE
+  //  COLISIÓN NAVE
   for (let i = rocks.length - 1; i >= 0; i--) {
     const rock = rocks[i];
 
@@ -133,26 +133,32 @@ function update() {
 
     if (dist < player.radius + rock.radius) {
       rocks.splice(i, 1);
-
+    
       lives--;
-
+    
+      container.classList.add("damage");
+    
+      setTimeout(() => {
+        container.classList.remove("damage");
+      }, 500); 
+    
       if (lives <= 0) {
         gameOver();
       } else {
         player.x = canvas.width / 2;
         player.y = canvas.height / 2;
       }
-
+    
       break;
     }
   }
 
-  // 🔫 disparo
+  // disparo
   if (keys.Space) {
     shoot();
   }
 
-  // 💥 explosiones
+  //  explosiones
   for (let i = explosions.length - 1; i >= 0; i--) {
     const e = explosions[i];
     e.update();
