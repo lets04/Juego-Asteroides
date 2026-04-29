@@ -1,300 +1,274 @@
-import { Player } from "./nave.js";
-import { Bullet } from "./bullet.js";
-import { Rock } from "./rock.js";
-import { Explosion } from "./explosion.js";
+import { Player as Jugador } from "./nave.js";
+import { Bullet as Bala } from "./bullet.js";
+import { Rock as Roca } from "./rock.js";
+import { Explosion as Explosion } from "./explosion.js";
 
-const bullets = [];
-const rocks = [];
-let isGameOver = false;
+const balas = [];
+const rocas = [];
+let juegoTerminado = false;
 
-let lastShot = 0;
-const shootDelay = 200;
+let ultimoDisparo = 0;
+const retrasoDisparo = 200;
 
-let playerName = "Jugador";
+let nombreJugador = "Jugador";
 
-let lives = 3;
-const livesElement = document.getElementById("livesValue");
-let lastSpawn = 0;
-const spawnDelay = 1500; // cada 1.5 segundos
-const explosions = [];
+let vidas = 3;
+const elementoVidas = document.getElementById("livesValue");
+let ultimaAparicionRoca = 0;
+const SegRocas = 5000; // Intervalo de aparición
+const explosiones = [];
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const scoreElement = document.getElementById("scoreValue");
-const timeElement = document.getElementById("timeValue");
+const elementoPuntaje = document.getElementById("scoreValue");
+const elementoTiempo = document.getElementById("timeValue");
 
-// Capturamos el color que definiste en el CSS
-// En tu archivo principal, antes de crear las rocas:
-const style = getComputedStyle(document.body);
-const themeColor = style.getPropertyValue("--main-color").trim() || "white";
+// Color del tema desde CSS
+const estilo = getComputedStyle(document.body);
+const colorTema = estilo.getPropertyValue("--main-color").trim() || "white";
 
-const startScreen = document.getElementById("start-screen");
-const startBtn = document.getElementById("startBtn");
-const playerNameInput = document.getElementById("playerNameInput");
-const playerNameUI = document.getElementById("playerNameUI");
+const pantallaInicio = document.getElementById("start-screen");
+const botonInicio = document.getElementById("startBtn");
+const entradaNombre = document.getElementById("playerNameInput");
+const interfazNombre = document.getElementById("playerNameUI");
 
-const gameOverScreen = document.getElementById("game-over-screen");
-const restartBtn = document.getElementById("restartBtn");
-const finalScore = document.getElementById("finalScore");
+const pantallaFinJuego = document.getElementById("game-over-screen");
+const botonReiniciar = document.getElementById("restartBtn");
+const puntajeFinal = document.getElementById("finalScore");
 
-restartBtn.addEventListener("click", () => {
-  resetGame();
+botonReiniciar.addEventListener("click", () => {
+  reiniciarJuego();
 });
 
-// Cuando las crees:
+// Crear rocas iniciales
 for (let i = 0; i < 5; i++) {
-  rocks.push(new Rock(canvas.width, canvas.height, themeColor, 3));
+  rocas.push(new Roca(canvas.width, canvas.height, colorTema, 3));
 }
-const keys = {
+
+const teclas = {
   ArrowLeft: false,
   ArrowRight: false,
   ArrowUp: false,
   Space: false,
 };
 
-const container = document.getElementById("game-container");
+const contenedor = document.getElementById("game-container");
 
-canvas.width = container.clientWidth;
-canvas.height = container.clientHeight;
+canvas.width = contenedor.clientWidth;
+canvas.height = contenedor.clientHeight;
 
-const player = new Player(canvas.width / 2, canvas.height / 2);
+const jugador = new Jugador(canvas.width / 2, canvas.height / 2);
 
-let score = 0;
-let startTime = Date.now();
+let puntaje = 0;
+let tiempoInicio = Date.now();
 
 window.addEventListener("keydown", (e) => {
-  if (keys.hasOwnProperty(e.key)) {
-    keys[e.key] = true;
+  if (teclas.hasOwnProperty(e.key)) {
+    teclas[e.key] = true;
   }
-
   if (e.code === "Space") {
-    keys.Space = true;
+    teclas.Space = true;
   }
 });
 
 window.addEventListener("keyup", (e) => {
-  if (keys.hasOwnProperty(e.key)) {
-    keys[e.key] = false;
+  if (teclas.hasOwnProperty(e.key)) {
+    teclas[e.key] = false;
   }
-
   if (e.code === "Space") {
-    keys.Space = false;
+    teclas.Space = false;
   }
 });
-// Crear 5 rocas al empezar
 
-let gameStarted = false;
-startBtn.addEventListener("click", () => {
-  const name = playerNameInput.value.trim();
+let juegoIniciado = false;
+botonInicio.addEventListener("click", () => {
+  const nombre = entradaNombre.value.trim();
 
-  if (name !== "") {
-    playerName = name;
+  if (nombre !== "") {
+    nombreJugador = nombre;
   }
 
-  startScreen.style.display = "none";
-
-  startGame();
+  pantallaInicio.style.display = "none";
+  iniciarJuego();
 });
 
-function startGame() {
-  playerNameUI.innerText = playerName;
-  gameStarted = true;
-  startTime = Date.now();
-  gameLoop();
+function iniciarJuego() {
+  interfazNombre.innerText = nombreJugador;
+  juegoIniciado = true;
+  tiempoInicio = Date.now();
+  bucleJuego();
 }
 
-function gameLoop() {
-  if (!gameStarted || isGameOver) return;
+function bucleJuego() {
+  if (!juegoIniciado || juegoTerminado) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  update();
-  draw();
+  actualizar();
+  dibujar();
 
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(bucleJuego);
 }
 
-function update() {
-  //  jugador
-  player.update(keys, canvas);
+function actualizar() {
+  // Jugador
+  jugador.update(teclas, canvas);
 
-  //  tiempo y score
-  const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
-  timeElement.innerText = timeElapsed;
-  scoreElement.innerText = score;
-  livesElement.innerText = lives;
+  // Tiempo, puntaje y vidas
+  const tiempoTranscurrido = Math.floor((Date.now() - tiempoInicio) / 1000);
+  elementoTiempo.innerText = tiempoTranscurrido;
+  elementoPuntaje.innerText = puntaje;
+  elementoVidas.innerText = vidas;
 
-  //  BALAS
-  for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
-    const b = bullets[bIndex];
+  // BALAS
+  for (let i = balas.length - 1; i >= 0; i--) {
+    const b = balas[i];
     b.update();
 
     if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
-      bullets.splice(bIndex, 1);
+      balas.splice(i, 1);
     }
   }
 
-  //  ROCAS + COLISIÓN
-  for (let rIndex = rocks.length - 1; rIndex >= 0; rIndex--) {
-    const rock = rocks[rIndex];
-    rock.update(canvas.width, canvas.height);
+  // ROCAS + COLISIÓN CON BALAS
+  for (let i = rocas.length - 1; i >= 0; i--) {
+    const roca = rocas[i];
+    roca.update(canvas.width, canvas.height);
 
-    for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
-      const bullet = bullets[bIndex];
+    for (let j = balas.length - 1; j >= 0; j--) {
+      const bala = balas[j];
+      const distancia = Math.hypot(bala.x - roca.x, bala.y - roca.y);
 
-      const dist = Math.hypot(bullet.x - rock.x, bullet.y - rock.y);
+      if (distancia < roca.radius) {
+        explosiones.push(new Explosion(roca.x, roca.y, bala.color));
 
-      if (dist < rock.radius) {
-        explosions.push(new Explosion(rock.x, rock.y, bullet.color));
+        rocas.splice(i, 1);
+        balas.splice(j, 1);
 
-        rocks.splice(rIndex, 1);
-        bullets.splice(bIndex, 1);
-
-        fragmentRock(rock);
-        score += rock.size * 100;
-
+        fragmentarRoca(roca);
+        puntaje += roca.size * 100;
         break;
       }
     }
   }
 
-  //  COLISIÓN NAVE
-  for (let i = rocks.length - 1; i >= 0; i--) {
-    const rock = rocks[i];
+  // COLISIÓN ROCA CON NAVE
+  for (let i = rocas.length - 1; i >= 0; i--) {
+    const roca = rocas[i];
+    const distancia = Math.hypot(jugador.x - roca.x, jugador.y - roca.y);
 
-    const dist = Math.hypot(player.x - rock.x, player.y - rock.y);
+    if (distancia < jugador.radius + roca.radius) {
+      rocas.splice(i, 1);
+      vidas--;
 
-    if (dist < player.radius + rock.radius) {
-      rocks.splice(i, 1);
-
-      lives--;
-
-      container.classList.add("damage");
-
+      contenedor.classList.add("damage");
       setTimeout(() => {
-        container.classList.remove("damage");
+        contenedor.classList.remove("damage");
       }, 500);
 
-      if (lives <= 0) {
-        gameOver();
+      if (vidas <= 0) {
+        finDelJuego();
       } else {
-        player.x = canvas.width / 2;
-        player.y = canvas.height / 2;
+        jugador.x = canvas.width / 2;
+        jugador.y = canvas.height / 2;
       }
-
       break;
     }
   }
 
-  // disparo
-  if (keys.Space) {
-    shoot();
+  // Disparo
+  if (teclas.Space) {
+    disparar();
   }
 
-  //  explosiones
-  for (let i = explosions.length - 1; i >= 0; i--) {
-    const e = explosions[i];
-    e.update();
+  // Explosiones
+  for (let i = explosiones.length - 1; i >= 0; i--) {
+    const exp = explosiones[i];
+    exp.update();
 
-    if (e.isDone()) {
-      explosions.splice(i, 1);
+    if (exp.isDone()) {
+      explosiones.splice(i, 1);
     }
   }
-  const now = Date.now();
 
-  if (now - lastSpawn > spawnDelay) {
-    lastSpawn = now;
-
-    const size = Math.random() > 0.5 ? 3 : 2;
-
-    rocks.push(new Rock(canvas.width, canvas.height, themeColor, size));
+  // Aparición de nuevas rocas
+  const ahora = Date.now();
+  if (ahora - ultimaAparicionRoca > SegRocas) {
+    ultimaAparicionRoca = ahora;
+    const tamano = Math.random() > 0.5 ? 3 : 2;
+    rocas.push(new Roca(canvas.width, canvas.height, colorTema, tamano));
   }
 }
 
-function gameOver() {
-  isGameOver = true;
-
-  finalScore.innerText = `${playerName}, tu puntaje fue: ${score}`;
-
-  gameOverScreen.style.display = "flex";
+function finDelJuego() {
+  juegoTerminado = true;
+  puntajeFinal.innerText = `${nombreJugador}, tu puntaje fue: ${puntaje}`;
+  pantallaFinJuego.style.display = "flex";
 }
 
-function resetGame() {
-  lives = 3;
-  score = 0;
-  rocks.length = 0;
-  bullets.length = 0;
-  explosions.length = 0;
+function reiniciarJuego() {
+  vidas = 3;
+  puntaje = 0;
+  rocas.length = 0;
+  balas.length = 0;
+  explosiones.length = 0;
 
-  isGameOver = false;
-  gameStarted = true;
+  juegoTerminado = false;
+  juegoIniciado = true;
 
-  player.x = canvas.width / 2;
-  player.y = canvas.height / 2;
+  jugador.x = canvas.width / 2;
+  jugador.y = canvas.height / 2;
 
-  startTime = Date.now();
-  gameOverScreen.style.display = "none";
+  tiempoInicio = Date.now();
+  pantallaFinJuego.style.display = "none";
 
-  // recrear rocas
   for (let i = 0; i < 5; i++) {
-    rocks.push(new Rock(canvas.width, canvas.height, themeColor, 3));
+    rocas.push(new Roca(canvas.width, canvas.height, colorTema, 3));
   }
 
-  gameLoop();
+  bucleJuego();
 }
 
-function draw() {
-  player.draw(ctx);
-  bullets.forEach((b) => b.draw(ctx));
-  rocks.forEach((r) => r.draw(ctx));
-  explosions.forEach((e) => e.draw(ctx));
-
-  if (isGameOver) {
-    return;
-  }
+function dibujar() {
+  jugador.draw(ctx);
+  balas.forEach((b) => b.draw(ctx));
+  rocas.forEach((r) => r.draw(ctx));
+  explosiones.forEach((e) => e.draw(ctx));
 }
 
-function getRandomColor() {
-  const colors = [
-    "#00ffcc", // verde neon
-    "#ff4d4d", // rojo
-    "#ffd700", // amarillo
-    "#00aaff", // azul
-    "#ff00ff", // rosa
-    "#ffffff", // blanco
-  ];
-
-  return colors[Math.floor(Math.random() * colors.length)];
+function obtenerColorAleatorio() {
+  const colores = ["#00ffcc", "#ff4d4d", "#ffd700", "#00aaff", "#ff00ff", "#ffffff"];
+  return colores[Math.floor(Math.random() * colores.length)];
 }
 
-function shoot() {
-  const now = Date.now();
-  if (now - lastShot < shootDelay) return;
+function disparar() {
+  const ahora = Date.now();
+  if (ahora - ultimoDisparo < retrasoDisparo) return;
 
-  lastShot = now;
+  ultimoDisparo = ahora;
 
-  const offset = 20;
-  const angle = player.angle - Math.PI / 2;
+  const distanciaBala = 20;
+  const angulo = jugador.angle - Math.PI / 2;
 
-  const bulletX = player.x + Math.cos(angle) * offset;
-  const bulletY = player.y + Math.sin(angle) * offset;
+  const balaX = jugador.x + Math.cos(angulo) * distanciaBala;
+  const balaY = jugador.y + Math.sin(angulo) * distanciaBala;
 
-  bullets.push(new Bullet(bulletX, bulletY, angle, getRandomColor()));
+  balas.push(new Bala(balaX, balaY, angulo, obtenerColorAleatorio()));
 }
 
-function fragmentRock(rock) {
-  if (rock.size > 1) {
+function fragmentarRoca(roca) {
+  if (roca.size > 1) {
     for (let i = 0; i < 2; i++) {
-      rocks.push(
-        new Rock(
+      rocas.push(
+        new Roca(
           canvas.width,
           canvas.height,
-          rock.color,
-          rock.size - 1,
-          rock.x,
-          rock.y,
-        ),
+          roca.color,
+          roca.size - 1,
+          roca.x,
+          roca.y
+        )
       );
     }
   }
