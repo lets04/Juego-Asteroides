@@ -1,0 +1,113 @@
+body {
+  margin: 0;
+  background: black;
+  --main-color: #00ffcc;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+#start-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--main-color);
+  font-family: "Courier New", monospace;
+  z-index: 10;
+}
+
+#start-screen input {
+  padding: 10px;
+  margin: 10px;
+  font-size: 18px;
+  border: 2px solid var(--main-color);
+  background: black;
+  color: var(--main-color);
+}
+
+#start-screen button {
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  background: var(--main-color);
+  color: black;
+}
+
+#game-over-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+
+  display: none; 
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: red;
+  font-family: "Courier New", monospace;
+  z-index: 10;
+}
+
+#game-over-screen button {
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  font-family: "Courier New", monospace;
+  background: red;
+  color: white;
+}
+
+#game-container {
+  border: 3px solid var(--main-color);
+  box-shadow: 0 0 20px var(--main-color);
+  padding: 10px;
+  border-radius: 12px;
+
+  width: 1200px;
+  height: 650px;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: black;
+}
+
+#ui-layer {
+  margin-top: 15px;
+  width: 80%;
+  max-width: 800px;
+
+  display: flex;
+  justify-content: space-between;
+
+  font-family: "Courier New", Courier, monospace;
+  font-size: 22px;
+  color: var(--main-color);
+
+  text-shadow: 0 0 10px var(--main-color);
+}
+
+#game-container.damage {
+  border: 3px solid red;
+  box-shadow: 0 0 25px red;
+}

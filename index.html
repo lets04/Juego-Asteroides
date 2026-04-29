@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="js/main.js"></script>
+    <title>Juego Asteroides</title>
+  </head>
+
+  <body>
+    <div id="start-screen">
+      <h1>Juego Asteroides</h1>
+
+      <input type="text" id="playerNameInput" placeholder="Ingresa tu nombre" />
+
+      <button id="startBtn">Iniciar Juego</button>
+    </div>
+
+    <div id="game-over-screen">
+      <h1>GAME OVER</h1>
+      <p id="finalScore"></p>
+      <button id="restartBtn">Volver a jugar</button>
+    </div>
+    <div id="game-container">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="ui-layer">
+      <div>Jugador: <span id="playerNameUI"></span></div>
+      <div>Puntos: <span id="scoreValue">0</span></div>
+      <div>Tiempo: <span id="timeValue">0</span>s</div>
+      <div>Vidas: <span id="livesValue">3</span></div>
+    </div>
+  </body>
+</html>
