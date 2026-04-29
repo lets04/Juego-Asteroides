@@ -25,7 +25,7 @@ export class Bullet {
   draw(ctx) {
     ctx.save();
 
-    // 🔥 TRAIL con degradado
+    // (trazo) con degradado
     this.trail.forEach((p, i) => {
       const alpha = i / this.trail.length;
 
@@ -36,7 +36,7 @@ export class Bullet {
       ctx.fill();
     });
 
-    // ⚡ BALITA PRINCIPAL (más brillante)
+    // (balita principal) (más brillante)
     ctx.beginPath();
     ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
 
@@ -47,7 +47,7 @@ export class Bullet {
 
     ctx.fill();
 
-    // ⚡ mini línea tipo láser (dirección)
+    // (mini línea tipo láser) (dirección)
     const tailLength = 12;
     const x2 = this.x - Math.cos(this.angle) * tailLength;
     const y2 = this.y - Math.sin(this.angle) * tailLength;
@@ -63,7 +63,7 @@ export class Bullet {
     ctx.restore();
   }
 
-  // 🔧 helper para color con transparencia
+  //helper para color con transparencia
   hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);

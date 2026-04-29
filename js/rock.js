@@ -59,7 +59,7 @@ export class Rock {
         ctx.strokeStyle = this.color; // Usa el color del tema
         ctx.lineWidth = 2;
 
-        // Efecto de brillo (Glow) que combine con tu CSS
+        // Efecto de brillo (Glow) 
         ctx.shadowBlur = 10;
         ctx.shadowColor = this.color;
 
