@@ -8,7 +8,7 @@ export class Rock {
         this.x = x ?? Math.random() * canvasWidth; //permitir spawn en punto exacto
         this.y = y ?? Math.random() * canvasHeight;
 
-        this.vx = (Math.random() - 0.5) * (4 - size); //más pequeñas = más rápidas
+        this.vx = (Math.random() - 0.5) * (4 - size); //más pequeñas más rápidas
         this.vy = (Math.random() - 0.5) * (4 - size);
 
         this.angle = Math.random() * Math.PI * 2;
@@ -55,7 +55,7 @@ export class Rock {
         }
         ctx.closePath();
 
-        // --- CONFIGURACIÓN DE ESTILO ---
+        // CONFIGURACIÓN DE ESTILo
         ctx.strokeStyle = this.color; // Usa el color del tema
         ctx.lineWidth = 2;
 
